@@ -8,7 +8,7 @@ import setuptools
 import sys
 import os, os.path
 
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 
 # Let setuptools fill in the blanks.
 

@@ -1,4 +1,4 @@
-/* 2021 - 2022 Jan Provaznik (provaznik@optics.upol.cz)
+/* 2019 - 2022 Jan Provaznik (jan@provaznik.pro)
  *
  * Interfaces COIN-OR IPOPT.
  * Unlike the competition it tries to keep you sane.

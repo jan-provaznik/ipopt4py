@@ -1,2 +1,30 @@
-The documentation is left as exercise for the reader.
+Interior Point Optimizer (COIN-OR IPOPT) interface for Python.
+
+Prerequisites
+
+  - Python 3 (tested with version 3.10.1)
+  - Boost.Python (tested with version 1.78)
+  - Successfully compiled and installed IPOPT (tested with version 3.14.5)
+  - GCC release that supports at least C++14 (tested with version 11.1.0)
+
+Installation
+
+  - Assuming the prerequisites are satisfied it is possible to install (build)
+    the package with Pip.
+  - In particular to install the development branch execute
+
+    pip install --user --upgrade \
+      git+https://github.com/jan-provaznik/ipopt4py.git
+
+Notes
+
+  Please note this is an early in-development release.
+
+References
+
+  https://github.com/coin-or/Ipopt
+
+Documentation
+
+  The documentation is left as exercise for the reader.
 
