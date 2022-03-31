@@ -183,13 +183,13 @@ struct proxy_nlp : coin::TNLP {
     xlen = boost::python::extract<coin_index_t>($xcount);
     glen = boost::python::extract<coin_index_t>($gcount);
 
-    /* Assume dense jacobian of constraints. */
+    // Assume dense jacobian of constraints.
     jlen = glen * xlen;
 
-    /* Assume dense hessian of lagrangian. */
+    // Assume dense hessian of lagrangian.
     hlen = xlen * xlen;
 
-    /* Enforce 0-based indexing of sparse matrices. */
+    // Enforce 0-based indexing of sparse matrices.
     flag = coin::TNLP::C_STYLE;
 
     return true;
@@ -256,9 +256,10 @@ struct proxy_nlp : coin::TNLP {
     // xstart
 
     if (xset) {
-      count = copy_ndarray_into_data(glen, xval, make_ndarray($xstart));
-      if (xlen != count)
+      count = copy_ndarray_into_data(xlen, xval, make_ndarray($xstart));
+      if (xlen != count) {
         throw std::runtime_error("Starting point (xstart) in get_starting_point shorter than xcount.");
+      }
     }
 
     return true;
@@ -366,7 +367,7 @@ struct proxy_nlp : coin::TNLP {
     bnp::ndarray result = make_ndarray(retval);
 
     count = copy_ndarray_into_data(jlen, jval, result);
-    if (glen != count) {
+    if (jlen != count) {
       throw std::runtime_error("The result of gradg is shorter than xcount * gcount.");
     }
 
@@ -465,8 +466,8 @@ struct proxy_nlp : coin::TNLP {
     proxy_nlp_result $result;
 
   private:
-    boost::python::numpy::dtype $dtype = boost::python::numpy::dtype::get_builtin<coin_value_t>();
-    boost::python::object $xpoint;
+    bnp::dtype $dtype = bnp::dtype::get_builtin<coin_value_t>();
+    bpy::object $xpoint;
 
   private:
     bpy::object $evalf; bpy::object $gradf;
@@ -507,27 +508,27 @@ minimize (
     options_stream << std::endl;
   }
 
-  // Initialize the IPOPT application interface with the option stream
-
+  //
   coin::ApplicationReturnStatus status;
   coin::SmartPtr<coin::IpoptApplication> app = IpoptApplicationFactory();
 
-  status = app->Initialize(options_stream);
+  // This is absolutely necessary to keep our sanity intact
+  app->RethrowNonIpoptException(true);
+
+  // Initialize the IPOPT application interface with the option stream,
+  // permitting manual overrides below.
+  status = app->Initialize(options_stream, true);
   
   // Update (force) some options: avoid printing the IPOPT banner
   app->Options()->SetStringValue("sb", "yes");
 
-  // 
-  app->Options()->SetIntegerValue("print_level", 1);
-  app->Options()->SetNumericValue("tol", 1e-8);
-  app->Options()->SetStringValue("mu_strategy", "adaptive");
+  // Update (force) some options: use BFGS for the Hessian matrix
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
 
-  // @todo this should yield some results or something we can use
+  // Bang!
   status = app->OptimizeTNLP(problem);
 
-  //std::cerr << "SOLVER STATUS " << status << std::endl;
-
+  //
   return problem->$result;
 }
 
