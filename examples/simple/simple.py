@@ -17,8 +17,8 @@ def evalg (isnew, point):
         
 def gradg (isnew, point):
     return numpy.array([
-        point[0] / numpy.linalg.norm(point, 2),
-        point[1] / numpy.linalg.norm(point, 2)
+        [   point[0] / numpy.linalg.norm(point, 2),
+            point[1] / numpy.linalg.norm(point, 2) ]
     ])
 
 # Options

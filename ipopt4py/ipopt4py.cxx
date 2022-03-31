@@ -97,7 +97,12 @@ copy_ndarray_into_data (
     throw std::runtime_error("The numpy.ndarray is not C-ordered.");
   }
 
-  size_t count = std::min((size_t) bpy::len(array), size);
+  size_t ndarray_size = 1;
+  for (size_t index = 0, ndims = array.get_nd(); index < ndims; ++index) {
+    ndarray_size = ndarray_size * array.shape(index);
+  }
+
+  size_t count = std::min(ndarray_size, size);
   size_t bytes = count * sizeof(T);
 
   /* We copy on byte level.
