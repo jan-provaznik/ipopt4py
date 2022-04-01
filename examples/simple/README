@@ -15,3 +15,8 @@ Analytic solution
   Using the method of Lagrange multipliers the location of the minimum is
   revealed at (sqrt(2), sqrt(2)).
 
+Examples
+
+  1. simple.py  uses analytic gradient and jacobian information
+  2. numeric.py uses numeric  gradient and jacobian 
+

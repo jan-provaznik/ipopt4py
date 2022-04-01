@@ -5,19 +5,9 @@ import numpy
 def evalf (isnew, point):
     return numpy.linalg.norm(point - 1, 2)
 
-def gradf (isnew, point):
-    value = evalf(isnew, point)
-    return (point - 1) / numpy.linalg.norm(point - 1, 2)
-
 def evalg (isnew, point):
     return numpy.array([
         numpy.linalg.norm(point, 2)
-    ])
-        
-def gradg (isnew, point):
-    return numpy.array([
-        [   point[0] / numpy.linalg.norm(point, 2),
-            point[1] / numpy.linalg.norm(point, 2) ]
     ])
 
 # Options
@@ -41,7 +31,7 @@ xstart = [ 1, 3 ]
 # Bang!
 res = ipopt4py.minimize(
     evalf, evalg,
-    gradf, gradg,
+    0, 0,
     xstart,
     xlimit, glimit,
     options

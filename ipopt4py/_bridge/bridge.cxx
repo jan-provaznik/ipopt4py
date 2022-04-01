@@ -29,6 +29,7 @@ namespace bnp = boost::python::numpy;
 // COIN-OR IPOPT support
 
 #include <coin/IpTNLP.hpp>
+#include <coin/IpIpoptData.hpp>
 #include <coin/IpIpoptApplication.hpp>
 
 namespace coin = Ipopt;
@@ -126,6 +127,8 @@ struct proxy_nlp_result {
   bpy::object fval;
   bpy::object xval;
   bpy::object gval;
+
+  int niter;
 };
 
 /* Proxied non-linear problem. */
@@ -389,7 +392,7 @@ struct proxy_nlp : coin::TNLP {
     coin_index_t glen, const coin_value_t * gval,
     const coin_value_t *,
     coin_value_t fval,
-    const coin::IpoptData *, 
+    const coin::IpoptData * meta, 
     coin::IpoptCalculatedQuantities *
   ) {
     $result.status  = status;
@@ -399,6 +402,8 @@ struct proxy_nlp : coin::TNLP {
     $result.fval = bpy::object(fval);
     $result.xval = make_ndarray_from_data(xlen, xval).copy();
     $result.gval = make_ndarray_from_data(glen, gval).copy();
+
+    $result.niter = meta->iter_count();
   }
 
   //
@@ -467,12 +472,16 @@ struct proxy_nlp : coin::TNLP {
     return bnp::array(from, $dtype);
   }
 
-  public:
-    proxy_nlp_result $result;
+  inline
+  proxy_nlp_result 
+  result () {
+    return $result;
+  }
 
   private:
     bnp::dtype $dtype = bnp::dtype::get_builtin<coin_value_t>();
     bpy::object $xpoint;
+    proxy_nlp_result $result;
 
   private:
     bpy::object $evalf; bpy::object $gradf;
@@ -534,14 +543,14 @@ minimize (
   status = app->OptimizeTNLP(problem);
 
   //
-  return problem->$result;
+  return problem->result();
 }
 
 /* Module entry point.
  * Registers types and functions with python runtime.
  */
 
-BOOST_PYTHON_MODULE (ipopt4py) {
+BOOST_PYTHON_MODULE (_bridge) {
 
   // As per the documentation, 
   // the boost::python::numpy environment must be initialized.
@@ -553,7 +562,8 @@ BOOST_PYTHON_MODULE (ipopt4py) {
     .def_readonly("success", & proxy_nlp_result::success)
     .def_readonly("fval",    & proxy_nlp_result::fval)
     .def_readonly("gval",    & proxy_nlp_result::gval)
-    .def_readonly("xval",    & proxy_nlp_result::xval);
+    .def_readonly("xval",    & proxy_nlp_result::xval)
+    .def_readonly("niter",   & proxy_nlp_result::niter);
 
   boost::python::def("minimize", minimize);
 

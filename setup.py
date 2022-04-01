@@ -8,13 +8,13 @@ import setuptools
 import sys
 import os, os.path
 
-VERSION = '0.0.6'
+VERSION = '0.1.0'
 
 # Let setuptools fill in the blanks.
 
-ipopt4py = setuptools.Extension(
-    name = 'ipopt4py',
-    sources = [ 'ipopt4py/ipopt4py.cxx' ],
+bridge = setuptools.Extension(
+    name = 'ipopt4py._bridge',
+    sources = [ 'ipopt4py/_bridge/bridge.cxx' ],
     libraries = [ 'boost_python3', 'boost_numpy3', 'ipopt' ],
     define_macros = [ ('IPOPT4PY_VERSION', '"{}"'.format(VERSION)) ],
     extra_compile_args = [ '-std=c++17', '-Wextra', '-pthread', '-Wno-sign-compare' ],
@@ -31,6 +31,7 @@ setuptools.setup(
     author_email = 'jan@provaznik.pro',
     url = 'https://provaznik.pro/ipopt4py',
     license = 'LGPL',
-    ext_modules = [ ipopt4py ]
+    ext_modules = [ bridge ],
+    packages = [ 'ipopt4py' ]
 )
 
