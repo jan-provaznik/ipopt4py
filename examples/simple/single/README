@@ -17,6 +17,5 @@ Analytic solution
 
 Examples
 
-  1. simple.py  uses analytic gradient and jacobian information
-  2. numeric.py uses numeric  gradient and jacobian 
+  Uses user-provided gradients and jacobians.
 
