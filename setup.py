@@ -5,10 +5,8 @@
 # Let's see how poorly this goes.
 
 import setuptools
-import sys
-import os, os.path
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 # Let setuptools fill in the blanks.
 
@@ -26,11 +24,16 @@ bridge = setuptools.Extension(
 setuptools.setup(
     name = 'ipopt4py',
     version = VERSION,
-    description = 'Basic interface for COIN-OR IPOPT 3.14 library.',
+    description = 'Basic interface for the COIN-OR IPOPT 3.14 library.',
     author = 'Jan Provaznik',
     author_email = 'jan@provaznik.pro',
     url = 'https://provaznik.pro/ipopt4py',
     license = 'LGPL',
+
+    install_requires = [
+        'numpy >= 1.22',
+        'scipy >= 1.8.0'
+    ],
     ext_modules = [ bridge ],
     packages = [ 'ipopt4py' ]
 )
