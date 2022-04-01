@@ -3,16 +3,18 @@ import numpy
 
 # Optimization problem definition.
 def evalf (isnew, point):
+    print(point)
     return numpy.linalg.norm(point - 1, 2)
 def evalg (isnew, point):
     return numpy.array([
         numpy.linalg.norm(point, 2),
-        3 - point[0] - point[1]
+        3 - numpy.sum(point)
     ])
 
 # Options
 options = [
-    "print_level 0"
+    "print_level 4",
+    "derivative_test first-order"
 ]
 
 # Boundary configuration (region)
@@ -22,11 +24,11 @@ xlimit = (xlimlo, xlimhi)
 
 # Boundary configuration (constraints)
 glimlo = [ 0, - numpy.inf ]
-glimhi = [ 3, 0 ]
+glimhi = [ 5, 0 ]
 glimit = (glimlo, glimhi)
 
 # Initial, starting point
-xstart = [ 1.5, 1.5 ]
+xstart = [ 4, 3 ]
 
 # Bang!
 res = ipopt4py.minimize(

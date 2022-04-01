@@ -1,0 +1,17 @@
+         Example: a simple objective function with multiple constraits
+
+Problem statement
+
+  minimize
+    sqrt((x - 1) ** 2 + (y - 1) ** 2)
+  subject to
+    sqrt(x ** 2 + y ** 2) <= 5
+    x + y >= 3
+  with (x, y) bound to
+    0 < x < 5
+    0 < y < 5
+
+Examples
+
+  Uses user-provided gradients and jacobians.
+

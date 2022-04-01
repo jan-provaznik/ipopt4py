@@ -10,7 +10,7 @@ from ._bridge import (
     Result
 )
 
-def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
+def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = [], finite_diff_method = '2-point'):
     '''
     Find local minimum using COIN-OR Interior Point Optimizer IPOPT.
 
@@ -34,6 +34,10 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
         Limits on the constraints. 
         The 1st iterable should define the lower limits,
         the 2nd iterable should define the upper limits.
+    options : list of strings
+        Options to be passed down to the IPOPT engine.
+    finite_diff_method : string
+        Either a '2-point' or '3-point' difference scheme.
 
     Returns
     -------
@@ -47,8 +51,8 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
 
         evalf = _newx_wrapper(evalf)
         proxyf = ScalarFunction(evalf,
-            xstart, (), '2-point', _dummy_function, 
-            None, (- numpy.inf, numpy.inf)
+            xstart, (), finite_diff_method, _dummy_function, 
+            None, xlimit
         )
 
         evalf = _skip_newx_wrapper(proxyf.fun)
@@ -60,8 +64,8 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
 
         evalg = _newx_wrapper(evalg)
         proxyg = VectorFunction(evalg,
-            xstart, '2-point', _dummy_function,
-            None, None, (- numpy.inf, numpy.inf), False
+            xstart, finite_diff_method, _dummy_function,
+            None, None, xlimit, False
         )
 
         evalg = _skip_newx_wrapper(proxyg.fun)
