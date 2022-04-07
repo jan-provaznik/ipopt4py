@@ -3,7 +3,6 @@ import numpy
 
 # Optimization problem definition.
 def evalf (isnew, point):
-    print(point)
     return numpy.linalg.norm(point - 1, 2)
 
 def gradf (isnew, point):
@@ -25,7 +24,7 @@ def gradg (isnew, point):
 
 # Options
 options = [
-    "print_level 0"
+    'print_level 0'
 ]
 
 # Boundary configuration (region)

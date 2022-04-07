@@ -15,7 +15,3 @@ Examples
 
   Numerically computed gradient and jacobi matrices.
 
-Notes
-
-  Why it gets lost and runs into the bounds is currently beyond me.
-

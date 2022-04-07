@@ -10,20 +10,27 @@ from ._bridge import (
     Result
 )
 
-def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = [], finite_diff_method = '2-point'):
+def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
     '''
     Find local minimum using COIN-OR Interior Point Optimizer IPOPT.
 
     Parameters
     ----------
     evalf : callable
-        Objective function.
+        Objective function, evalf(isnew, point) where isnew indicates whether
+        the point changed between calls to {eval,grad}{f,g} arguments.
     evalg : callable
-        Constraints.
-    gradf : callable or null
-        First derivatives of the objective function.
+        Constraint (vector) function, evalg(isnew, point).
+    gradf : callable or string or null
+        First derivatives of the objective function, gradf(isnew, point).
+        If not a callable, the gradient is approximted using a finite
+        difference algorithm from SciPy. A string value can be used to indicate
+        the differentiation scheme, either '2-point' or '3-point' method. The
+        central difference ('3-point') method is used by default.
     gradg : callable or null
         First derivatives of the constraint functions (Jacobi matrix).
+        If null, approximated with finite difference algorithms by IPOPT.
+        Achieved by setting the jacobian_approximation option.
     xstart : numpy.ndarray
         Starting point.
     xlimit : pair of iterables
@@ -36,8 +43,6 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = [], 
         the 2nd iterable should define the upper limits.
     options : list of strings
         Options to be passed down to the IPOPT engine.
-    finite_diff_method : string
-        Either a '2-point' or '3-point' difference scheme.
 
     Returns
     -------
@@ -49,27 +54,26 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = [], 
         import numpy
         from scipy.optimize._differentiable_functions import ScalarFunction
 
-        evalf = _newx_wrapper(evalf)
-        proxyf = ScalarFunction(evalf,
-            xstart, (), finite_diff_method, _dummy_function, 
+        if gradf == '2-point' or gradf == '3-point':
+            finite_diff_method = gradf
+        else:
+            finite_diff_method = '3-point'
+
+        # @todo We should do the isnew-based memoization ourselves here.
+
+        evalf = _wrap_evalf(evalf)
+        proxy = ScalarFunction(evalf,
+            xstart, (), finite_diff_method, _none_function, 
             None, xlimit
         )
 
-        evalf = _skip_newx_wrapper(proxyf.fun)
-        gradf = _skip_newx_wrapper(proxyf.grad)
+        evalf = _wrap_proxy(proxy.fun)
+        gradf = _wrap_proxy(proxy.grad)
 
     if not callable(gradg):
-        import numpy
-        from scipy.optimize._differentiable_functions import VectorFunction
-
-        evalg = _newx_wrapper(evalg)
-        proxyg = VectorFunction(evalg,
-            xstart, finite_diff_method, _dummy_function,
-            None, None, xlimit, False
-        )
-
-        evalg = _skip_newx_wrapper(proxyg.fun)
-        gradg = _skip_newx_wrapper(proxyg.jac)
+        options = options + [
+            'jacobian_approximation finite-difference-values'
+        ]
 
     # Off we go!
 
@@ -86,16 +90,16 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = [], 
         options
     )
 
-def _dummy_function (* args):
+def _none_function (* args):
     return None
 
-def _newx_wrapper (function):
-    def wrapped (point):
-        return function(1, point)
-    return wrapped
+def _wrap_evalf (evalf):
+    def wrapper (point):
+        return evalf(1, point)
+    return wrapper
 
-def _skip_newx_wrapper (function):
-    def wrapped (skip, point):
+def _wrap_proxy (function):
+    def wrapper (isnew, point):
         return function(point)
-    return wrapped
+    return wrapper
 

@@ -3,7 +3,6 @@ import numpy
 
 # Optimization problem definition.
 def evalf (isnew, point):
-    print(point)
     return numpy.linalg.norm(point - 1, 2)
 def evalg (isnew, point):
     return numpy.array([
@@ -13,8 +12,7 @@ def evalg (isnew, point):
 
 # Options
 options = [
-    "print_level 4",
-    "derivative_test first-order"
+    'print_level 0'
 ]
 
 # Boundary configuration (region)

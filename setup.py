@@ -6,7 +6,7 @@
 
 import setuptools
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 # Let setuptools fill in the blanks.
 
