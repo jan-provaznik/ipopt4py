@@ -4,12 +4,6 @@
 #
 # COIN-OR IPOPT interface for constrained non-linear optimization.
 
-from ._bridge import (
-    minimize
-        as _minimize,
-    Result
-)
-
 def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
     '''
     Find local minimum using COIN-OR Interior Point Optimizer IPOPT.
@@ -50,6 +44,10 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
         A structure giving the result of the optimization endeavour.
     '''
 
+    from ._bridge import Result, minimize as _minimize
+
+    # Handle the gradient of the objective function.
+
     if not callable(gradf):
         import numpy
         from scipy.optimize._differentiable_functions import ScalarFunction
@@ -75,11 +73,20 @@ def minimize (evalf, evalg, gradf, gradg, xstart, xlimit, glimit, options = []):
             'jacobian_approximation finite-difference-values'
         ]
 
-    # Off we go!
+    # Extract limits imposed on the search area and the constraints
 
     xlimlo, xlimhi = xlimit
     glimlo, glimhi = glimit
+
+    if len(xlimlo) != len(xlimhi):
+        raise ValueError('Mismatched lengths of lower and upper limits on search area (xlimit pair).')
+
+    if len(glimlo) != len(glimhi):
+        raise ValueError('Mismatched lengths of lower and upper limits on constraints (glimit pair).')
+
     xcount, gcount = len(xlimlo), len(glimlo)
+
+    # Off we go!
 
     return _minimize(
         evalf, gradf,

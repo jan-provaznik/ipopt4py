@@ -11,7 +11,7 @@ Problem statement
     0 < x < 5
     0 < y < 5
 
-Examples
+Description
 
   Numerically computed gradient and jacobi matrices.
 
